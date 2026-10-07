@@ -4,7 +4,7 @@
  * - Request ke Apps Script (POST) tidak pernah disentuh SW.
  * Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-const VERSION = 'hmis-v2.1.0';
+const VERSION = 'hmis-v2.1.1';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -27,7 +27,8 @@ self.addEventListener('fetch', (e) => {
   // Halaman: network-first (dapat versi terbaru), fallback cache saat offline
   if (req.mode === 'navigate') {
     e.respondWith(
-      fetch(req)
+      // no-cache: lewati cache HTTP GitHub Pages (10 menit) agar index.html baru langsung dipakai
+      fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
         .then((res) => {
           const copy = res.clone();
           caches.open(VERSION).then((c) => c.put('./index.html', copy));
