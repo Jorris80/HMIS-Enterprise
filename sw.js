@@ -4,7 +4,7 @@
  * - Request ke Apps Script (POST) tidak pernah disentuh SW.
  * Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-const VERSION = 'hmis-v2.1.2';
+const VERSION = 'hmis-v2.1.4';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
