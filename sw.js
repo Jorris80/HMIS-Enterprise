@@ -1,10 +1,10 @@
 /* SIMRS Enterprise — Service Worker (mode offline PWA)
  * - App shell (index.html, manifest, ikon) disimpan di cache → aplikasi tetap terbuka tanpa internet.
  * - Data TIDAK di-cache di sini: data pasien disimpan aplikasi di IndexedDB & disinkron lewat outbox.
- * - Request ke Apps Script (POST) tidak pernah disentuh SW.
+ * - Request ke Apps Script / Supabase (POST) tidak pernah disentuh SW.
  * Naikkan VERSION setiap kali index.html diperbarui agar pengguna mendapat versi baru.
  */
-const VERSION = 'hmis-v2.2.0';
+const VERSION = 'hmis-v2.3.0';
 const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -35,6 +35,22 @@ self.addEventListener('fetch', (e) => {
           return res;
         })
         .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // config.js (alamat server): selalu ambil versi terbaru, pakai cache hanya saat offline
+  if (url.origin === self.location.origin && /\/config\.js$/.test(url.pathname)) {
+    e.respondWith(
+      fetch(req, { cache: 'no-cache' })
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(VERSION).then((c) => c.put(req, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
     );
     return;
   }
